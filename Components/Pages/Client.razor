@@ -1,0 +1,65 @@
+﻿@page "/Client"
+@using System.Globalization
+@using System.Text.Json
+@using ProyectServiceShared.Models
+<h3>Clientes</h3>
+
+<table class="table table-striped table-hover table-bordered caption-top">
+    <caption>Lista de clientes</caption>
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Teléfono</th> 
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in Clients)
+        {
+            <tr>
+                <th scope="row">@cliente.Id</th>
+                <td>@cliente.Nombre</td>
+                <td>@cliente.Apellido</td>
+                <td>@cliente.Telefono</td>
+                <td>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Client> Clients = new List<Client>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            using (HttpClient http = new HttpClient())
+            {
+                var respuesta = await http.GetFromJsonAsync<List<Client>>("http://localhost:5070/api/Client/Listado");
+
+                if (respuesta != null)
+                {
+                    foreach (var cliente in respuesta)
+                    {
+                     //  Console.WriteLine($"Cliente: Id={cliente.Id}, Nombre={cliente.Nombre}, Telefono={cliente.Telefono}");
+                    }
+
+                    Clients = respuesta;
+                }
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}
