@@ -1,0 +1,358 @@
+:root {
+    /* 🎨 Colores principales */
+    --primary-orange: #ff9800;
+    --primary-orange-hover: #e03d00;
+    --dark-bg: #1c1c1c;
+    --dark-bg-alt: #2a2a2a;
+    --light-text: #fff;
+    --muted-text: #cccccc;
+    --dark-color: #232946;
+    --hover-color: rgba(255, 152, 0, 0.15);
+    --active-color: rgba(255, 152, 0, 0.25);
+    /* 📏 Espaciado */
+    --spacing-unit: 1rem;
+    /* 🔲 Bordes y sombras */
+    --border-color: #333333;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.4);
+    /* ✍️ Tipografía */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 🌍 Reset / Base */
+html, body {
+    background-color: var(--dark-bg) !important;
+    color: var(--light-text) !important;
+    font-family: var(--font-family) !important;
+    height: 100%;
+}
+
+.page {
+    background-color: var(--dark-bg) !important;
+    color: var(--light-text) !important;
+}
+
+/* 🔗 Links */
+a {
+    color: var(--primary-orange);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+    a:hover {
+        color: var(--primary-orange-hover);
+    }
+
+/* 🔘 Botones */
+.btn {
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background-color: var(--primary-orange);
+    color: var(--light-text);
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-orange-hover);
+    }
+
+/* 🗂️ Cards */
+.card {
+    background-color: var(--dark-bg-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: var(--light-text);
+}
+
+/* 📝 Inputs y formularios */
+input, select, textarea {
+    background-color: var(--dark-bg-alt);
+    border: 1px solid var(--border-color);
+    color: var(--primary-orange) !important;
+    border-radius: 6px;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary-orange);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
+    }
+
+/* 📊 Tablas */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .table th, .table td {
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .table th {
+        background-color: var(--dark-bg-alt);
+        color: var(--primary-orange);
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #222;
+    }
+
+    .content-wrapper .table td {
+        color: var(--primary-orange) !important;
+    }
+
+/* 📌 Navbar */
+.navbar {
+    background-color: var(--dark-bg-alt) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: var(--light-text) !important;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: var(--primary-orange) !important;
+    }
+
+/* 📋 Sidebar */
+.sidebar {
+    background-color: var(--dark-bg-alt) !important;
+    color: var(--light-text) !important;
+}
+
+    .sidebar a {
+        color: var(--light-text) !important;
+    }
+
+        .sidebar a:hover {
+            background-color: var(--hover-color) !important;
+        }
+
+/* 🔣 Iconos Bootstrap */
+.bi {
+    font-size: 1rem; /* Normal */
+    vertical-align: middle;
+}
+
+.navbar .bi {
+    font-size: 1.2rem; /* Un poquito más grande en navbar */
+}
+
+/* Layout principal */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row;
+    background-color: var(--dark-bg) !important;
+}
+
+/* Contenido principal */
+.content-wrapper {
+    flex: 1;
+    margin-left: 220px;
+    padding: 2rem;
+    background-color: var(--dark-bg) !important;
+    color: var(--light-text) !important;
+    min-height: calc(100vh - 3.5rem);
+}
+
+/* Sidebar (nav-scrollable) */
+.nav-scrollable {
+    width: 220px;
+    background-color: var(--dark-bg-alt) !important;
+    color: var(--light-text) !important;
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.nav-scrollable nav.flex-column {
+    padding: 0;
+}
+
+.nav-scrollable .nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.nav-scrollable .nav-link {
+    color: var(--light-text) !important;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.nav-scrollable .nav-link:hover {
+    background-color: var(--hover-color) !important;
+    color: var(--primary-orange) !important;
+}
+
+.nav-scrollable .nav-link.active {
+    background-color: var(--primary-orange) !important;
+    color: var(--light-text) !important;
+}
+
+/* Iconos SVGs en NavMenu */
+.nav-link svg {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Responsive: Ocultar sidebar en mobile y ajustar content */
+/* Centrado corregido del título en el sidebar - Versión actualizada */
+.nav-scrollable .top-row {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding-left: 0 !important; /* Sobrescribe ps-3 (padding izquierdo) */
+    padding-right: 0 !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 0.5rem;
+    background-color: var(--dark-bg-alt);
+    border-bottom: 1px solid var(--border-color); /* Opcional: línea separadora */
+    width: 100%; /* Asegura que ocupe todo el ancho del sidebar */
+}
+
+.nav-scrollable .top-row .navbar-brand {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    width: 100%; /* Ocupa el ancho completo para centrado perfecto */
+    font-size: 1.2rem; /* Opcional: tamaño más grande */
+    color: var(--light-text) !important;
+    display: block !important; /* Asegura que sea block para width 100% */
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        margin-left: 0 !important;
+        padding: 1rem !important;
+    }
+    
+    .nav-scrollable {
+        width: 100% !important;
+        position: relative !important;
+        height: auto !important;
+        z-index: auto;
+    }
+    
+    .top-row {
+        position: sticky;
+        top: 0;
+        z-index: 1050;
+    }
+
+    .menu-toggle {
+        display: none; /* Ocultar toggle en mobile, ya que sidebar es full-width */
+    }
+
+    .nav-scrollable .top-row {
+        justify-content: center !important; /* Asegurar centrado en mobile */
+        padding-left: 0 !important; /* Sobrescribe ps-3 en mobile también */
+    }
+}
+
+/* Estilos para el contenedor del toggle del menú en sidebar */
+.menu-toggle {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: transparent;
+}
+
+.menu-toggle .navbar-toggler {
+    border: none;
+    background: transparent;
+    padding: 0.5rem;
+    margin: 0;
+    color: var(--light-text);
+    transition: background-color 0.2s ease;
+}
+
+.menu-toggle .navbar-toggler:hover {
+    background-color: var(--hover-color);
+    border-radius: 4px;
+}
+
+.menu-toggle .navbar-toggler:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-orange);
+}
+
+/* Estilos para headings para corregir herencia de tema oscuro */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--light-text) !important;
+    background-color: var(--dark-bg) !important;
+    border: none !important;
+    margin: 0.5rem 0 !important;
+    padding: 0 !important;
+}
+
+.content-wrapper h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Opcional: para mejor legibilidad */
+    background-color: var(--dark-bg) !important;
+    border: none !important;
+}
+
+.form-label {
+    color: var(--primary-orange) !important;
+}
+/* Forzar estilo oscuro en tablas */
+.table {
+    background-color: var(--dark-bg) !important;
+    color: var(--light-text) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Encabezados */
+.table th {
+    background-color: var(--dark-bg-alt) !important;
+    color: var(--primary-orange) !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Celdas */
+.table td {
+    color: var(--light-text) !important;
+}
+
+/* Filas alternadas */
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #2a2a2a !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #1c1c1c !important;
+}
+
+/* Hover */
+.table-hover > tbody > tr:hover {
+    background-color: rgba(255, 152, 0, 0.15) !important;
+    color: var(--light-text) !important;
+}
+

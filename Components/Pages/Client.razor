@@ -1,65 +1,312 @@
 ﻿@page "/Client"
 @using System.Globalization
-@using System.Text.Json
-@using ProyectServiceShared.Models
+@using System.Collections.Generic
+@using System.Linq
+@using ProyectServiceClient.Components.Modals
+
+@inject IHttpClientFactory HttpClientFactory
+
 <h3>Clientes</h3>
 
-<table class="table table-striped table-hover table-bordered caption-top">
-    <caption>Lista de clientes</caption>
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Apellido</th>
-            <th scope="col">Teléfono</th> 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var cliente in Clients)
-        {
+@if (loading)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else if (error != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @error
+    </div>
+}
+else if (Clients == null || !Clients.Any())
+{
+    <div class="alert alert-info" role="alert">
+        No hay clientes disponibles.
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success" role="alert">
+            @successMessage
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">Filtros de búsqueda</div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <select class="form-select" @bind="filterOption">
+                        <option value="">Todos los campos</option>
+                        <option value="nombre">Nombre</option>
+                        <option value="apellido">Apellido</option>
+                        <option value="telefono">Teléfono</option>
+                    </select>
+                </div>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" placeholder="Buscar..." @bind="searchTerm" @bind:event="oninput" @onkeyup="FilterClients" />
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-outline-primary" type="button" @onclick="FilterClients">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-2">
+        <button class="btn btn-success btn-sm" @onclick="OpenCreateModal">
+            <i class="bi bi-plus-circle"></i> Nuevo Cliente
+        </button>
+    </div>
+
+    @if (!filteredClients.Any())
+    {
+        <div class="alert alert-info">No se encontraron clientes con ese criterio.</div>
+}
+else
+{
+    <table class="table table-striped table-hover table-bordered caption-top">
+        <caption>Lista de clientes</caption>
+        <thead class="table-dark">
             <tr>
-                <th scope="row">@cliente.Id</th>
-                <td>@cliente.Nombre</td>
-                <td>@cliente.Apellido</td>
-                <td>@cliente.Telefono</td>
-                <td>
-                    <button class="btn btn-primary btn-sm">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </button>
-                    <button class="btn btn-danger btn-sm">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </button>
-                </td>
+                <th scope="col">Id</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+                @foreach (var cliente in GetPaginatedClients())
+            {
+                <tr> 
+                    <th scope="row">@cliente.Id</th>
+                    <td>@(cliente?.Nombre?? "")</td>
+                    <td>@(cliente?.Apellido ?? "")</td>
+                    <td>@(cliente?.Telefono ?? "")</td>
+                    <td>
+                            <button class="btn btn-primary btn-sm" @onclick="() => OpenEditModal(cliente!)">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => ShowDeleteConfirm(cliente!)">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(_paginationState.CurrentPage == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => ChangePage(_paginationState.CurrentPage - 1)">Anterior</button>
+                </li>
+                @for (int i = 1; i <= _paginationState.TotalPages; i++)
+                {
+                    var pageNumber = i;
+                    <li class="page-item @(pageNumber == _paginationState.CurrentPage ? "active" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(pageNumber)">@pageNumber</button>
+                    </li>
+                }
+                <li class="page-item @(_paginationState.CurrentPage == _paginationState.TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => ChangePage(_paginationState.CurrentPage + 1)">Siguiente</button>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+
+<ClientCreateEdit @ref="clientCreateEditModal" OnSave="SaveClient" OnClose="CloseCreateEditModal" />
+<ClientDelete @ref="clientDeleteModal" Client="clientToDelete" OnConfirm="ConfirmDelete" OnCancel="CloseDeleteModal" />
 
 @code {
-    private List<Client> Clients = new List<Client>();
+    private List<ProyectServiceClient.Models.Client> Clients { get; set; } = new();
+    private List<ProyectServiceClient.Models.Client> filteredClients { get; set; } = new();
+    private string? error;
+    private bool loading = true;
+    private string? successMessage;
+    private string searchTerm = "";
+    private string filterOption = "";
+    private class PaginationState
+    {
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
+        public int TotalItems { get; set; }
+        public int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
+
+        public bool CanNavigateToPage(int page) => page >= 1 && page <= TotalPages;
+    }
+    private PaginationState _paginationState = new();
+    private ClientCreateEdit? clientCreateEditModal;
+    private ClientDelete? clientDeleteModal;
+    private ProyectServiceClient.Models.Client? clientToDelete;
 
     protected override async Task OnInitializedAsync()
     {
+        loading = true;
+        error = null;
         try
         {
-            using (HttpClient http = new HttpClient())
-            {
-                var respuesta = await http.GetFromJsonAsync<List<Client>>("http://localhost:5070/api/Client/Listado");
-
+            var http = HttpClientFactory.CreateClient("API");
+            var respuesta = await http.GetFromJsonAsync<List<ProyectServiceClient.Models.Client>>("api/Client/Listado");
                 if (respuesta != null)
                 {
-                    foreach (var cliente in respuesta)
-                    {
-                     //  Console.WriteLine($"Cliente: Id={cliente.Id}, Nombre={cliente.Nombre}, Telefono={cliente.Telefono}");
-                    }
-
                     Clients = respuesta;
+                filteredClients = Clients;
+                _paginationState.TotalItems = filteredClients.Count;
+                    Console.WriteLine($"Datos cargados correctamente: {Clients.Count} clientes.");
+                }
+                else
+                {
+                Clients = new();
+                filteredClients = new();
+                _paginationState.TotalItems = 0;
+                    Console.WriteLine("La respuesta de la API es nula.");
                 }
             }
-        }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            error = $"Error al cargar los datos: {ex.Message}";
+            Clients = new();
+            filteredClients = new();
+            _paginationState.TotalItems = 0;
+            Console.WriteLine(error);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void FilterClients()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredClients = Clients;
+        }
+        else
+        {
+            filteredClients = Clients.Where(c =>
+                ((string.IsNullOrEmpty(filterOption) || filterOption == "nombre") && c.Nombre != null && c.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                ((string.IsNullOrEmpty(filterOption) || filterOption == "apellido") && c.Apellido != null && c.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                ((string.IsNullOrEmpty(filterOption) || filterOption == "telefono") && c.Telefono != null && c.Telefono.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
+
+        _paginationState.CurrentPage = 1;
+        _paginationState.TotalItems = filteredClients.Count;
+    }
+
+    private IEnumerable<ProyectServiceClient.Models.Client> GetPaginatedClients()
+    {
+        return filteredClients
+            .Skip((_paginationState.CurrentPage - 1) * _paginationState.PageSize)
+            .Take(_paginationState.PageSize);
+    }
+
+    private void ChangePage(int page)
+    {
+        if (_paginationState.CanNavigateToPage(page))
+        {
+            _paginationState.CurrentPage = page;
+        }
+    }
+
+    private void OpenCreateModal()
+    {
+        clientCreateEditModal?.Show("Crear Nuevo Cliente", new ProyectServiceClient.Models.Client
+        {
+            Id = 0,
+            Nombre = "",
+            Apellido = "",
+            Telefono = ""
+        });
+    }
+
+    private void OpenEditModal(ProyectServiceClient.Models.Client cliente)
+    {
+        clientCreateEditModal?.Show("Editar Cliente", new ProyectServiceClient.Models.Client
+        {
+            Id = cliente.Id,
+            Nombre = cliente.Nombre,
+            Apellido = cliente.Apellido,
+            Telefono = cliente.Telefono
+        });
+    }
+
+    private void CloseCreateEditModal()
+    {
+        StateHasChanged();
+    }
+
+    private void ShowDeleteConfirm(ProyectServiceClient.Models.Client cliente)
+    {
+        clientToDelete = cliente;
+        clientDeleteModal?.Show();
+    }
+
+    private void CloseDeleteModal()
+    {
+        StateHasChanged();
+    }
+
+    private async Task SaveClient(ProyectServiceClient.Models.Client cliente)
+    {
+        try
+        {
+            var http = HttpClientFactory.CreateClient("API");
+            if (cliente.Id == 0)
+            {
+                await http.PostAsJsonAsync("api/Client/Crear", cliente);
+                successMessage = "Cliente creado exitosamente.";
+            }
+            else
+            {
+                await http.PutAsJsonAsync($"api/Client/Actualizar/{cliente.Id}", cliente);
+                successMessage = "Cliente actualizado exitosamente.";
+            }
+
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al guardar el cliente: {ex.Message}";
+            Console.WriteLine(error);
+        }
+    }
+
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            if (clientToDelete == null)
+            {
+                error = "No hay cliente seleccionado para eliminar.";
+                return;
+            }
+
+            var http = HttpClientFactory.CreateClient("API");
+            await http.DeleteAsync($"api/Client/Eliminar/{clientToDelete.Id}");
+            successMessage = "Cliente eliminado exitosamente.";
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al eliminar el cliente: {ex.Message}";
+            Console.WriteLine(error);
+        }
+        finally
+        {
+            clientDeleteModal?.Hide();
         }
     }
 }

@@ -1,0 +1,74 @@
+@using ProyectServiceClient.Models
+
+<div class="modal @ModalClass" tabindex="-1" style="display:@ModalDisplay">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" @onclick="Cancel"></button>
+            </div>
+            <div class="modal-body">
+                @if (Service != null)
+                {
+                    <p>¿Está seguro que desea eliminar el servicio de <strong>@Service.Nombre @Service.Apellido</strong>?</p>
+                    <p>Esta acción no se puede deshacer.</p>
+                }
+                else
+                {
+                    <p>No se ha seleccionado ningún servicio para eliminar.</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@(Service == null)">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    [Parameter]
+    public Service? Service { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private bool ShowModal { get; set; }
+    private string ModalDisplay => ShowModal ? "block" : "none";
+    private string ModalClass => ShowModal ? "show" : "";
+    private bool ShowBackdrop => ShowModal;
+
+    public void Show()
+    {
+        ShowModal = true;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        ShowModal = false;
+        StateHasChanged();
+    }
+
+    private void Cancel()
+    {
+        ShowModal = false;
+        OnCancel.InvokeAsync();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        await OnConfirm.InvokeAsync();
+        ShowModal = false;
+    }
+}

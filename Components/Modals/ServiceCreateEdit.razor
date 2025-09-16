@@ -1,0 +1,113 @@
+@using ProyectServiceClient.Models
+
+<div class="modal @ModalClass" tabindex="-1" style="display:@ModalDisplay">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" @onclick="Close"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="@Service" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <InputText id="nombre" class="form-control" @bind-Value="Service.Nombre" />
+                            <ValidationMessage For="@(() => Service.Nombre)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <InputText id="apellido" class="form-control" @bind-Value="Service.Apellido" />
+                            <ValidationMessage For="@(() => Service.Apellido)" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="equipo" class="form-label">Equipo</label>
+                            <InputText id="equipo" class="form-control" @bind-Value="Service.Equipo" />
+                            <ValidationMessage For="@(() => Service.Equipo)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <InputText id="telefono" class="form-control" @bind-Value="Service.Telefono" />
+                            <ValidationMessage For="@(() => Service.Telefono)" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="diagnostico" class="form-label">Diagnóstico</label>
+                        <InputTextArea id="diagnostico" class="form-control" @bind-Value="Service.Diagnostico" rows="3" />
+                        <ValidationMessage For="@(() => Service.Diagnostico)" />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="valor" class="form-label">Valor ($)</label>
+                            <InputNumber id="valor" class="form-control" @bind-Value="Service.Valor" />
+                            <ValidationMessage For="@(() => Service.Valor)" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sena" class="form-label">Seña ($)</label>
+                            <InputNumber id="sena" class="form-control" @bind-Value="Service.Seña" />
+                            <ValidationMessage For="@(() => Service.Seña)" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fechaIngreso" class="form-label">Fecha de Ingreso</label>
+                            <InputDate id="fechaIngreso" class="form-control" @bind-Value="Service.FechaIngreso" />
+                            <ValidationMessage For="@(() => Service.FechaIngreso)" />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<Service> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private Service Service { get; set; } = new Service();
+    private string Title { get; set; } = "";
+    private bool ShowModal { get; set; }
+    private string ModalDisplay => ShowModal ? "block" : "none";
+    private string ModalClass => ShowModal ? "show" : "";
+    private bool ShowBackdrop => ShowModal;
+
+    public void Show(string title, Service service)
+    {
+        Title = title;
+        Service = service;
+        ShowModal = true;
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        ShowModal = false;
+        OnClose.InvokeAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await OnSave.InvokeAsync(Service);
+        ShowModal = false;
+    }
+}

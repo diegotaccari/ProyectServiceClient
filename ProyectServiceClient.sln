@@ -1,11 +1,8 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectServiceClient", "ProyectServiceClient.csproj", "{AA32AA9A-6724-4A97-8E80-CC3885CA6B99}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectServiceShared", "..\ProyectServiceShared\ProyectServiceShared.csproj", "{1329CAD1-41BD-4AEE-844C-F79F698364DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +14,6 @@ Global
 		{AA32AA9A-6724-4A97-8E80-CC3885CA6B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA32AA9A-6724-4A97-8E80-CC3885CA6B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA32AA9A-6724-4A97-8E80-CC3885CA6B99}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1329CAD1-41BD-4AEE-844C-F79F698364DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1329CAD1-41BD-4AEE-844C-F79F698364DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1329CAD1-41BD-4AEE-844C-F79F698364DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1329CAD1-41BD-4AEE-844C-F79F698364DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

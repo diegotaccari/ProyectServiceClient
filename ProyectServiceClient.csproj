@@ -7,18 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.0" />
-		<PackageReference Include="System.Net.Http.Json" Version="9.0.3" />
+		<PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+		<PackageReference Include="Blazor.Bootstrap" Version="2.9.5" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\ProyectServiceShared\ProyectServiceShared.csproj" />
-	</ItemGroup>
-	
-
-
 
 </Project>
